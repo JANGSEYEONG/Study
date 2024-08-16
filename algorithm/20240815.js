@@ -1,0 +1,169 @@
+// 1. dp + 숫자를 한자리로 볼건지, 두자리로 보는지 케이스에 따라 분기
+function solution(s) {
+  let answer = 0;
+  // 2개씩 선택할 수 있는 최대 개수
+  let dp = new Array(s.length + 1).fill(0);
+  dp[0] = 1;
+  dp[1] = 1;
+  for (let i = 1; i < s.length; i++) {
+    const one = Number(s.slice(i, i + 1));
+    const two = Number(s.slice(i - 1, i + 1));
+    if (one >= 1 && one <= 9) {
+      dp[i + 1] += dp[i];
+    }
+    if (two >= 10 && two <= 26) {
+      dp[i + 1] += dp[i - 1];
+    }
+  }
+  return dp[s.length];
+}
+
+// 2. dp + 괄호 쌍 가능 개수, 왼쪽 경우의 수 * 오른쪽 경우의 수
+function solution(n) {
+  const dp = new Array(n + 1).fill(0);
+  dp[0] = 1; // 빈 문자열
+  dp[1] = 1; // 한쌍
+  for (let i = 2; i <= n; i++) {
+    // 좌, 우를 나눈다
+    // 왼쪽에서 나올 경우의 수 * 우측에서 나올 경우의 수
+    for (let k = 0; k < i; k++) {
+      dp[i] += dp[k] * dp[i - k - 1];
+    }
+  }
+
+  return dp[n];
+}
+
+// 3. dp + 숫자 배열 주어졌을 때 곱의 합의 최소 (카드 뽑기 문제)
+function solution(nums) {
+  const n = nums.length;
+  // dp[i][j]는 i부터 j까지의 부분 배열에서의 최소 점수
+  const dp = Array.from({ length: n }, () => Array(n).fill(Infinity));
+
+  // 초기화: 길이가 2인 부분 배열은 선택할 수 없으므로 점수는 0
+  for (let i = 0; i < n - 1; i++) {
+    dp[i][i + 1] = 0;
+  }
+
+  // 길이를 3부터 n까지 증가시키며 계산
+  for (let len = 3; len <= n; len++) {
+    for (let i = 0; i <= n - len; i++) {
+      let j = i + len - 1;
+      // k는 i+1부터 j-1까지의 모든 가능한 선택을 나타냄
+      for (let k = i + 1; k < j; k++) {
+        dp[i][j] = Math.min(dp[i][j], dp[i][k] + dp[k][j] + nums[i] * nums[k] * nums[j]);
+      }
+    }
+  }
+
+  // 전체 배열의 최소 점수 반환
+  return dp[0][n - 1];
+}
+
+// 4. 조합 + 구현 (효율성 실패, 추후 답안 나오면 체크 필요)
+function solution(prices, d, k) {
+  const sortedPrices = [...prices].sort((a, b) => a - b);
+  // 1. 모두 비교 -> 평균
+  if (diffCheck(sortedPrices, d)) {
+    return getAvg(sortedPrices);
+  }
+  // 2. 가장 비싸고 가장 싼거 제외 -> 평균
+  const exceptPrices = [...sortedPrices];
+  exceptPrices.shift();
+  exceptPrices.pop();
+  if (diffCheck(exceptPrices, d)) {
+    return getAvg(exceptPrices);
+  }
+
+  // 3. 임의로 k개 골라서 그중 가장 비싸고 싼거 비교-> 임의개 평균
+  // 정당한 k개가 여러개라면, 그 중 평균값이 가장 낮은 것으로 결정
+  let minAvg = Infinity;
+  generateCombinations(sortedPrices, k, d).forEach((combination) => {
+    if (diffCheck(combination, d)) {
+      minAvg = Math.min(minAvg, getAvg(combination));
+    }
+  });
+
+  if (minAvg !== Infinity) {
+    return minAvg;
+  }
+
+  // 4. 오름차순 중앙값을 판매값으로, 두개면 작은값으로
+  let center = -1;
+  const centerIndex = Math.floor(sortedPrices.length / 2);
+  if (sortedPrices.length % 2 === 0) {
+    // 길이가 짝수 -> 가운데 2개
+    center = Math.min(sortedPrices[centerIndex], sortedPrices[centerIndex - 1]);
+  } else {
+    // 길이가 홀수 -> 가운데 1개
+    center = sortedPrices[centerIndex];
+  }
+
+  return center;
+}
+
+function diffCheck(array, d) {
+  return Math.max(...array) - Math.min(...array) <= d;
+}
+
+function getAvg(array) {
+  return Math.floor(array.reduce((acc, x) => (acc += x), 0) / array.length);
+}
+
+// 조합 생성기
+function generateCombinations(arr, k, d) {
+  const results = [];
+
+  function backtrack(start, current) {
+    if (current.length === k) {
+      results.push([...current]);
+      return;
+    }
+
+    for (let i = start; i < arr.length; i++) {
+      // 현재 조합의 최소값과 최대값을 유지
+      const minInCurrent = Math.min(...current);
+      const maxInCurrent = Math.max(...current);
+
+      // 새로 추가할 값과의 차이 체크
+      if (arr[i] - minInCurrent <= d && maxInCurrent - arr[i] <= d) {
+        current.push(arr[i]);
+        backtrack(i + 1, current);
+        current.pop();
+      }
+    }
+  }
+
+  backtrack(0, []);
+  return results;
+}
+
+// 5. 구현
+function solution(sentence, keyword, skips) {
+  var answer = '';
+  sentence = [...sentence];
+  keyword = [...keyword];
+
+  let pointer = 0;
+  while (skips.length > 0) {
+    let insertWord = getNextKeyword(keyword);
+    let addLocation = skips.shift();
+    for (let i = 0; i < addLocation; i++) {
+      if (sentence[pointer + i] === insertWord) {
+        addLocation = i + 1;
+      }
+    }
+    pointer += addLocation;
+    if (pointer > sentence.length) break; // 건너뛴 숫자가 길이를 넘어서면 멈춤
+    sentence.splice(pointer, 0, insertWord);
+    pointer++;
+  }
+  return sentence.join('');
+}
+
+// 현재 순서 단어 돌려주면서 뒤에 이어붙이는함수
+function getNextKeyword(keyword) {
+  const rtnWord = keyword.shift();
+  keyword.push(rtnWord);
+  return rtnWord;
+}
