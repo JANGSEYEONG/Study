@@ -1,6 +1,6 @@
 ## 역방항 BFS
 
-관련 문제 : https://github.com/JANGSEYEONG/Study/blob/main/algorithm/20240820.md#3-%EB%8B%A4%EC%A4%91-%EC%8B%9C%EC%9E%91%EC%A0%90-bfs-%EC%97%AD%EB%B0%A9%ED%96%A5-bfs
+관련 문제 : https://github.com/JANGSEYEONG/Study/blob/main/algorithm/202408/20240820.md#3-%EB%8B%A4%EC%A4%91-%EC%8B%9C%EC%9E%91%EC%A0%90-bfs-%EC%97%AD%EB%B0%A9%ED%96%A5-bfs
 
 ### 역방향 BFS의 개념
 

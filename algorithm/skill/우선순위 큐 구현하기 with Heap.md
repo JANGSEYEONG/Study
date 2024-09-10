@@ -1,6 +1,6 @@
 ## 우선순위 큐 구현하기 with Heap
 
-관련 문제 : https://github.com/JANGSEYEONG/Study/blob/main/algorithm/20240823.md#1-bfs--%EC%9A%B0%EC%84%A0%EC%88%9C%EC%9C%84-%ED%81%90-heap
+관련 문제 : https://github.com/JANGSEYEONG/Study/blob/main/algorithm/202408/20240823.md#1-bfs--%EC%9A%B0%EC%84%A0%EC%88%9C%EC%9C%84-%ED%81%90-heap
 
 ### 우선순위 큐
 
