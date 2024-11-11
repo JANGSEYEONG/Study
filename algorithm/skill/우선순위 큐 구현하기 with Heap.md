@@ -106,3 +106,80 @@ class PriorityQueue {
   }
 }
 ```
+
+### 위에 구현한 힙의 문제
+
+1. 초기 구성의 비효율성
+   - 요소를 하나씩 push하면서 매번 \_bubbleUp 수행
+   - N개의 요소에 대해 각각 O(log N) 연산 수행
+   - 전체 시간복잡도: O(N log N)
+2. 불필요한 swap 연산
+
+### Heapify로 최적화하기
+
+- 기존 방식
+
+  - 초기 구성: O(N log N)
+  - 공간복잡도: O(N)
+  - 많은 swap 연산 필요
+
+- 최적화 후
+
+  - 초기 구성: O(N)
+  - 공간복잡도: O(N)
+  - swap 연산 최소화
+  - push/pop 연산은 여전히 O(log N)이지만 실제 수행 시간 개선
+
+1. 최적화된 초기 구성 (O(N))
+
+```javascript
+class PriorityQueue {
+  constructor(comparator, elements = []) {
+    this.heap = [...elements];
+    this.comparator = comparator;
+
+    // 바닥에서부터 위로 올라가며 힙 구성
+    for (let i = Math.floor(this.heap.length / 2) - 1; i >= 0; i--) {
+      this._bubbleDown(i);
+    }
+  }
+}
+```
+
+2. swap 연산 최적화
+
+```javascript
+_bubbleDown(index) {
+    const element = this.heap[index];  // 임시 저장
+    const length = this.size();
+
+    while (true) {
+        let swapIndex = null;
+        const leftChildIndex = 2 * index + 1;
+        const rightChildIndex = 2 * index + 2;
+
+        // 자식 노드들과 비교
+        if (leftChildIndex < length) {
+            if (this.comparator(this.heap[leftChildIndex], element)) {
+                swapIndex = leftChildIndex;
+            }
+        }
+
+        if (rightChildIndex < length) {
+            if (this.comparator(this.heap[rightChildIndex],
+                (swapIndex === null ? element : this.heap[swapIndex]))) {
+                swapIndex = rightChildIndex;
+            }
+        }
+
+        if (swapIndex === null) break;
+
+        // swap 대신 직접 할당
+        this.heap[index] = this.heap[swapIndex];
+        index = swapIndex;
+    }
+
+    // 최종 위치에 element 할당
+    this.heap[index] = element;
+}
+```
